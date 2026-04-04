@@ -30,6 +30,7 @@ function nowIso(): string {
 
 export class SessionStore {
   private readonly rootDir: string;
+  private readonly sessionKey: string;
   private readonly sessionDir: string;
   private readonly statePath: string;
   private readonly ledgerPath: string;
@@ -41,8 +42,10 @@ export class SessionStore {
 
   public constructor(private readonly repo: RepoContext) {
     const agentHome = process.env.CODEX_AGENT_HOME?.trim() || path.join(os.homedir(), ".codex-agent");
+    const sessionSuffix = process.env.CODEX_AGENT_SESSION_SUFFIX?.trim();
     this.rootDir = path.join(agentHome, "sessions");
-    this.sessionDir = path.join(this.rootDir, repo.hash);
+    this.sessionKey = sessionSuffix ? `${repo.hash}-${this.sanitizeLabel(sessionSuffix)}` : repo.hash;
+    this.sessionDir = path.join(this.rootDir, this.sessionKey);
     this.statePath = path.join(this.sessionDir, "current.json");
     this.ledgerPath = path.join(this.sessionDir, "ledger.jsonl");
     this.summaryPath = path.join(this.sessionDir, "summary.md");
@@ -54,6 +57,10 @@ export class SessionStore {
 
   public getStatePath(): string {
     return this.statePath;
+  }
+
+  public getSessionDir(): string {
+    return this.sessionDir;
   }
 
   public getSummaryPath(): string {
@@ -203,6 +210,7 @@ export class SessionStore {
 
   public listArtifacts(): string[] {
     return [
+      this.sessionDir,
       this.statePath,
       this.summaryPath,
       this.transcriptPath,

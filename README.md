@@ -10,6 +10,7 @@ It provides:
 - transcript, summary, assistant snapshot, turn artifact, and policy event persistence
 - an interactive CLI
 - a JSONL stdio bridge for external hosts such as a VS Code extension
+- a non-TTY `codex exec --json` runner for GUI-hosted turns
 
 ## Commands
 
@@ -24,6 +25,7 @@ node dist/bridge.js --cd /path/to/repo
 
 - `src/cli.ts`: terminal-first interactive harness
 - `src/bridge.ts`: JSONL bridge for editors and external runtimes
+- `src/runner.ts`: non-TTY `codex exec --json` runner used by GUI hosts
 - `src/session-store.ts`: durable state and artifact persistence
 - `src/policy.ts`: mode policy plus local validation
 - `src/interactive-state-sync.ts`: assistant turn segmentation and state sync
@@ -47,6 +49,17 @@ Output messages:
 {"type":"ready","repoRoot":"...","statePath":"..."}
 {"type":"output","data":"..."}
 {"type":"state","state":{...}}
+{"type":"turn_start","label":"...","mode":"agent","health":"running"}
+{"type":"turn_end","label":"...","success":false,"exitCode":101}
+{"type":"warning","message":"..."}
 {"type":"exit","code":0}
 {"type":"error","message":"..."}
 ```
+
+## Environment overrides
+
+The bridge and session store respect:
+
+- `CODEX_AGENT_HOME`
+- `CODEX_AGENT_TMPDIR`
+- `CODEX_AGENT_SESSION_SUFFIX`

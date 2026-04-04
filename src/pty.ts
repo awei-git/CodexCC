@@ -9,7 +9,7 @@ export interface PtyLike {
   onExit(listener: (exitCode: number) => void): void;
 }
 
-function resolveCodexBin(): string {
+export function resolveCodexBin(): string {
   const configured = process.env.CODEX_BIN?.trim();
   if (configured) {
     return configured;
